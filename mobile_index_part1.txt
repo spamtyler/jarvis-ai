@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JARVIS // NEURAL LINK</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: rgba(20, 20, 20, 0.6);
+            --accent-color: #00f3ff;
+            --accent-dim: rgba(0, 243, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --success: #00ff9d;
+            --danger: #ff0055;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            margin: 0;
+            height: 100dvh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image:
+                radial-gradient(circle at 50% 100%, #1a2a3a 0%, transparent 50%),
+                radial-gradient(circle at 50% 0%, #0a0a0a 0%, transparent 70%);
+            background-size: 100% 100%;
+        }
+
+        /* HEADER */
+        header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            z-index: 10;
+        }
+
+        .brand {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            font-size: 16px;
+            text-shadow: 0 0 15px var(--accent-dim);
+            opacity: 0.9;
+        }
+

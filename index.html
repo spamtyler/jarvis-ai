@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JARVIS // NEURAL LINK</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: rgba(20, 20, 20, 0.6);
+            --accent-color: #00f3ff;
+            --accent-dim: rgba(0, 243, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --success: #00ff9d;
+            --danger: #ff0055;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            margin: 0;
+            height: 100dvh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-image:
+                radial-gradient(circle at 50% 100%, #1a2a3a 0%, transparent 50%),
+                radial-gradient(circle at 50% 0%, #0a0a0a 0%, transparent 70%);
+            background-size: 100% 100%;
+        }
+
+        /* HEADER */
+        header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            z-index: 10;
+        }
+
+        .brand {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            font-size: 16px;
+            text-shadow: 0 0 15px var(--accent-dim);
+            opacity: 0.9;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            color: var(--success);
+            font-family: var(--font-mono);
+            background: rgba(0, 255, 157, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 157, 0.2);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* CHAT AREA */
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+            mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: rgba(0, 122, 255, 0.2);
+            border: 1px solid rgba(0, 122, 255, 0.3);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.jarvis {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        /* ORB ANIMATION (Thinking) */
+        #orb-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.5s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #orb-container.active {
+            opacity: 1;
+        }
+
+        .orb {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(20px);
+            animation: breathe 3s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.5); opacity: 0.8; }
+        }
+
+        /* QUICK ACTIONS */
+        #quick-actions {
+            flex-shrink: 0;
+            padding: 10px 20px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            z-index: 20;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-mono);
+            backdrop-filter: blur(5px);
+        }
+
+        .action-btn:active {
+            background: var(--accent-dim);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* INPUT AREA */
+        #input-area {
+            flex-shrink: 0;
+            padding: 20px;
+            padding-bottom: max(30px, env(safe-area-inset-bottom));
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            z-index: 20;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--accent-dim);
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-family: var(--font-main);
+            outline: none;
+        }
+
+        /* VOICE BUTTON (Central Hero) */
+        #voice-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        #voice-btn.listening {
+            background: var(--danger);
+            border-color: var(--danger);
+            box-shadow: 0 0 20px var(--danger);
+            transform: scale(1.1);
+            animation: pulse-red 1.5s infinite;
+        }
+
+        #send-btn {
+            background: var(--accent-color);
+            color: black;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 15px var(--accent-dim);
+            transition: transform 0.2s;
+        }
+
+        #send-btn:active { transform: scale(0.9); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 0, 85, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0); }
+        }
+
+        .icon { width: 22px; height: 22px; fill: currentColor; }
+    </style>
+</head>
+
+<body>
+    <div id="orb-container">
+        <div class="orb"></div>
+    </div>
+
+    <header>
+        <div class="brand">JARVIS</div>
+        <div class="status-indicator">
+            <div class="status-dot"></div>
+            <span>ONLINE</span>
+        </div>
+    </header>
+
+    <div id="chat-container">
+        <div class="message jarvis">
+            Neural Link established. I am listening.
+        </div>
+    </div>
+
+    <div id="quick-actions">
+        <button class="action-btn" onclick="sendCommand('System status')">📊 Status</button>
+        <button class="action-btn" onclick="sendCommand('Turn on lights')">💡 Lights On</button>
+        <button class="action-btn" onclick="sendCommand('Turn off lights')">🌑 Lights Off</button>
+        <button class="action-btn" onclick="sendCommand('What is on my screen?')">👀 See Screen</button>
+    </div>
+
+    <div id="input-area">
+        <button id="voice-btn" onclick="toggleVoice()">
+            <svg class="icon" viewBox="0 0 24 24">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+            </svg>
+        </button>
+
+        <div class="input-wrapper">
+            <input type="text" id="msg-input" placeholder="Type a command..." autocomplete="off">
+        </div>
+
+        <button id="send-btn" onclick="send()">
+            <svg class="icon" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        const input = document.getElementById('msg-input');
+        const chat = document.getElementById('chat-container');
+        const voiceBtn = document.getElementById('voice-btn');
+        const orb = document.getElementById('orb-container');
+        let recognition = null;
+
+        // Setup Voice Recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                voiceBtn.classList.add('listening');
+                input.placeholder = "Listening...";
+            };
+
+            recognition.onend = () => {
+                voiceBtn.classList.remove('listening');
+                input.placeholder = "Type a command...";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                input.value = transcript;
+                send();
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Mic Error:", event.error);
+                voiceBtn.classList.remove('listening');
+                if (event.error === 'not-allowed') {
+                    alert("Microphone access denied. Please check browser permissions.");
+                }
+            };
+        } else {
+            voiceBtn.style.display = 'none';
+        }
+
+        function toggleVoice() {
+            if (recognition) recognition.start();
+        }
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') send();
+        });
+
+        function sendCommand(cmd) {
+            input.value = cmd;
+            send();
+        }
+
+        async function send() {
+            const text = input.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'user');
+            input.value = '';
+            input.blur(); // Hide keyboard to see animation
+            
+            // Show Thinking Orb
+            orb.classList.add('active');
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await response.json();
+                
+                // Hide Thinking Orb
+                orb.classList.remove('active');
+                
+                addMessage(data.response, 'jarvis', data.audio);
+            } catch (e) {
+                orb.classList.remove('active');
+                addMessage("Error: Neural Link unstable.", 'jarvis');
+            }
+        }
+
+        function speak(text, audioBase64) {
+            if (audioBase64) {
+                const audio = new Audio("data:audio/wav;base64," + audioBase64);
+                audio.play();
+            } else {
+                const utterance = new SpeechSynthesisUtterance(text);
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function addMessage(text, sender, audioBase64 = null) {
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            div.innerHTML = text.replace(/\n/g, '<br>');
+            chat.appendChild(div);
+            setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 50);
+
+            if (sender === 'jarvis') {
+                speak(text, audioBase64);
+            }
+        }
+    </script>
+</body>
+</html>

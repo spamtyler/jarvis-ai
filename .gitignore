@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Home Assistant
+hass-config/
+
+# IDEs
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+vision_agent/models/*.onnx
+
+# Personal Data & Memory
+vision_agent/history.json
+vision_agent/memory_db/
+vision_agent/vision_history/
+vision_agent/*.png
+vision_agent/*.jpg
+
+# Security & Junk
+*.pem
+# *.txt  <-- Commented out to allow requirements.txt
+
+# Local Config
+homepage-config/services.yaml
+
+# Root level artifacts
+vision_history/
+*.jpg
+*.png
+debug_*.py
+list_ha_entities.py
+memory_db/
+models/
+*.deb
+
+# MCP Data & Tests
+obsidian_vault/
+test_*.py
